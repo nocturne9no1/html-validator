@@ -20,19 +20,25 @@ function createWindow() {
       preload: path.resolve(__dirname, './preload.js')
     }
   })
-
+  win.openDevTools();
   win.loadURL('http://localhost:3000');
-
+  // win.loadFile('index.html');
+  // 앱 실행 시 홈 화면에서 시작
+  const homedir = require('os').homedir();
+  fs.readdir(homedir, function(err, data) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+      win.webContents.send('FILE_LIST', ...data);
+    }
+  })
   remote.enable(win.webContents);
 }
 
 app.on('ready', function() {
   createWindow();
-  const homedir = require('os').homedir();
-  const homeDirList = fs.readdir(homedir, function(err, data) {
-    console.log(data);
-  })
-  console.log(homeDirList);
+
 });
 
 app.on('window-all-closed', function() {
@@ -57,15 +63,17 @@ ipcMain.on('CHANNEL_NAME', (evt, payload) => {
   const currentDir = __dirname;
   const test = path.join(currentDir, '/test.html');
 
-  console.log('hi its vnu', vnu);
-
-  // Work with vnu.jar, for example get vnu.jar version
-  execFile('java', ['-jar', `"${vnu}"`, test], { shell: true }, (error, stdout) => {
-    if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-    }
-    console.log('실행이 됬다', stdout);
-    console.log(stdout);
-  });
+  // html validator 실행 코드
+  /**
+   * 2번째 인수 Array 배열 2번 인덱스
+   * @param {string} 파일 주소
+  */
+  // execFile('java', ['-jar', `"${vnu}"`, test], { shell: true }, (error, stdout) => {
+  //   if (error) {
+  //       console.error(`exec error: ${error}`);
+  //       return;
+  //   }
+  //   console.log('실행이 됬다', stdout);
+  //   console.log(stdout);
+  // });
 })

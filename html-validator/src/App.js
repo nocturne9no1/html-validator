@@ -1,13 +1,10 @@
 import './App.css';
-const { ipcRenderer } = window;
+import FileList from './FileList';
 
 function App() {
-  const _handleBtn = () => {
-    ipcRenderer.send('CHANNEL_NAME', 'hi');
-  }
   return (
     <div className="App">
-      <button onClick={() => _handleBtn()}>test</button>
+      <FileList></FileList>
     </div>
   );
 }
