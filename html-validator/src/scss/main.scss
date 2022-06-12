@@ -1,0 +1,79 @@
+$main_color: #123456;
+$font_base: 14px;
+
+@mixin list_ico {
+  content: '';
+  width: 14px;
+  height: 14px;
+  padding-right: 14px;
+  display: inline-block;
+  background-repeat: no-repeat;
+}
+
+.screen_wrap {
+  display: flex;
+  padding: 20px;
+}
+
+.filelist_wrap {
+  border-right: 1px solid black;
+  padding-right: 40px;
+  margin-right: 40px;
+  min-width: 250px;
+  min-height: 100vh;
+  button {
+    width: 100%;
+    text-align: start;
+    outline: none;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    &:hover {
+      background-color: #123456;
+      color:white;
+    }
+    &.folder {
+      &::before {
+        @include list_ico;
+        background-image: url('../../public/img/ico_folder.svg');
+      }
+    }
+    &.html_file {
+      &::before {
+        @include list_ico;
+        background-image: url('../../public/img/ico_html_file.svg');
+      }
+    }
+  }
+  .breadcrumb {
+    font-size: $font_base + 2px;
+    margin-bottom: 40px;
+    font-weight: 500;
+  }
+  .back_btn {
+    &::before {
+      @include list_ico;
+      background: url('../../public/img/ico_back_arrow.svg') no-repeat;
+      background-size: contain;
+    }
+  }
+}
+
+.vali_result_wrap {
+  min-width: 400px;
+  max-width: calc(100vw - 500px);
+  .vali_result_title {
+    font-size: $font_base + 2px;
+    font-weight: 500;
+    margin-bottom: 40px;
+  }
+  .result_list {
+    .vali_result_item {
+      text-align: start;
+      line-height: 1.5;
+      & + li {
+        margin-top: 12px;
+      }
+    }
+  }
+}

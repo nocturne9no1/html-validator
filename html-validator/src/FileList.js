@@ -4,15 +4,6 @@ const { ipcRenderer } = window.require('electron');
 const FileList = () => {
   const [fileList, setFileList] = useState([]);
   const [folderRoute, setForderRoute] = useState([]);
-  useEffect(() => {
-    ipcRenderer.send('SET_FILE_LIST', 'init_folder_list');
-  }, []);
-
-  ipcRenderer.on('SET_FILE_LIST_REPLY', (evt, data) => {
-    console.log(data);
-    setFileList([...data.data]);
-    setForderRoute([...data.now]);
-  })
   
   const _handleBtn = (foldername) => {
     if (foldername.includes('.')) {
@@ -21,12 +12,29 @@ const FileList = () => {
       ipcRenderer.send('SET_FILE_LIST', [...folderRoute, foldername]);
     }
   }
+  const _handBackBtn = () => {
+    // setForderRoute([...folderRoute.filter((el, index) => index !== folderRoute.length - 1)]);
+    folderRoute.pop()  // 원래 위에걸로 돼야하는데... 추후 수정 요망
+    ipcRenderer.send('SET_FILE_LIST', [...folderRoute]);
+  }
+
+  useEffect(() => {
+    ipcRenderer.send('SET_FILE_LIST', 'init_folder_list');
+  }, []);
+
+  ipcRenderer.on('SET_FILE_LIST_REPLY', (evt, data) => {
+    // console.log(data);
+    setFileList([...data.data]);
+    setForderRoute([...data.now]);
+  })
 
   return (
-    <div>
-      <h2>{folderRoute.join('\\')}</h2>
+    <div className="filelist_wrap">
+      <h2 className="breadcrumb">{folderRoute.join('\\')}</h2>
+      <button className="back_btn" onDoubleClick={() => _handBackBtn()}>뒤로가기</button>
       <ul>
-        {fileList.map((el, idx) => <FileListItem el={el} key={idx} onDoubleClick={_handleBtn}></FileListItem>)}
+        {fileList.map((el, idx) => <FileListItem el={el} key={idx} 
+            isHtml={el.includes('.')} onDoubleClick={_handleBtn}></FileListItem>)}
       </ul>
     </div>
   )
@@ -34,8 +42,8 @@ const FileList = () => {
 
 const FileListItem = (props) => {
   return (
-    <li key={props.idx}>
-      <button onDoubleClick={(foldername) => props.onDoubleClick(props.el)}>
+    <li className="filelist_item" key={props.idx}>
+      <button className={(props.isHtml ? 'html_file' : 'folder')} onDoubleClick={(foldername) => props.onDoubleClick(props.el)}>
         {props.el}
       </button>
     </li>

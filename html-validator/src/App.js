@@ -5,8 +5,10 @@ import ValiResult from './ValiResult';
 function App() {
   return (
     <div className="App">
-      <FileList></FileList>
-      <ValiResult></ValiResult>
+      <div className="screen_wrap">
+        <FileList></FileList>
+        <ValiResult></ValiResult>
+      </div>
     </div>
   );
 }
