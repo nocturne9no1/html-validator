@@ -13,6 +13,7 @@ $font_base: 14px;
 .screen_wrap {
   display: flex;
   padding: 20px;
+  overflow: hidden;
 }
 
 .filelist_wrap {
@@ -21,6 +22,7 @@ $font_base: 14px;
   margin-right: 40px;
   min-width: 250px;
   min-height: 100vh;
+  overflow-y: scroll;
   button {
     width: 100%;
     text-align: start;
