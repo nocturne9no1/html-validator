@@ -49,22 +49,28 @@ app.on('activate', function() {
 
 // file explorer
 const homedir = require('os').homedir().split(path.sep);
+const nowOS = require('os').type();
+console.log(nowOS);
 let nowLocation = [...homedir];
-
+console.log('homedir: ' + nowLocation)
+nowLocation.forEach(e => console.log('hh: ' + e))
 ipcMain.on('SET_FILE_LIST', (evt, payload) => {
   // 앱 실행 시 홈 화면에서 시작
   console.log('payload: ' + payload);
   console.log('now_loca: ' + nowLocation);
-  // const now = path.join(nowLocation);
   if (payload !== 'init_folder_list') nowLocation = [...payload];
-  const now = path.join(...nowLocation);
-  console.log(now);
+  // 맥 os 에서 첫 '/' 안붙는 것에 대한 임시 방편 - 추후 수정 요망
+  let now = '';
+  if (nowOS === "Darwin") {
+    now = '/' + path.join(...nowLocation);
+  } else {
+    now = '/' + path.join(...nowLocation);
+  }
+  console.log('now: ' + now);
   fs.readdir(now, function(err, data) {
     if (err) {
       console.log(err);
     } else {
-      // console.log(data)
-      // data.forEach(el => console.log(path.extname(el)))
       const onlyFolderHTML = data.filter(el => !/^\./.test(el) && path.extname(el) === '' || path.extname(el) === '.html');
       const sendingData = {
         data: onlyFolderHTML,
@@ -76,11 +82,18 @@ ipcMain.on('SET_FILE_LIST', (evt, payload) => {
 });
 
 ipcMain.on('VALIDATE_FILE', (evt, payload) => {
-  const filePath = path.join(...payload);
+  // const filePath = '/' + path.join(...payload);
+  // 맥 os 에서 첫 '/' 안붙는 것에 대한 임시 방편 - 추후 수정 요망
+  let filePath = '';
+  if (nowOS === "Darwin") {
+    filePath = '/' + path.join(...payload);
+  } else {
+    filePath = path.join(...payload);
+  }
   console.log(filePath);
   execFile('java', ['-jar', `"${vnu}"`, filePath], { shell: true }, (error, stdout) => {
     if (error) {
-        // console.error(`exec error: ${error}`);
+        console.error(`exec error: ${error}`);
         evt.reply('SEND_VALI_RESULT', error);
         return;
     }
