@@ -2,10 +2,10 @@ const { app, BrowserWindow, shell } = require('electron');
 const { ipcMain } = require('electron');
 const remote = require('@electron/remote/main');
 const path = require('path');
-const { readFileSync } = require('original-fs');
 const fs = require('fs');
 const { execFile } = require('child_process');
 const vnu = require('vnu-jar');
+const isDev = require("electron-is-dev");
 
 remote.initialize();
 
@@ -21,7 +21,11 @@ function createWindow() {
     }
   })
   win.openDevTools();
-  win.loadURL('http://localhost:3000');
+  win.loadURL(
+    isDev
+    ? 'http://localhost:3000' 
+    : `file://${path.join(__dirname, "../build/index.html")}`
+  );
   
   // remote.enable(win.webContents);
 }
@@ -42,32 +46,8 @@ app.on('activate', function() {
 
 })
 
-// ipc communication
-ipcMain.on('CHANNEL_NAME', (evt, payload) => {
-  console.log(payload);
 
-  evt.reply('IPC_RENDERER_CHANNEL_NAME', 'message');
-  fs.readdir('./public', function(err, data) {
-    console.log(data);
-  })
-  const currentDir = __dirname;
-  const test = path.join(currentDir, '/test.html');
-
-  // html validator 실행 코드
-  /**
-   * 2번째 인수 Array 배열 2번 인덱스
-   * @param {string} 파일 주소
-  */
-  // execFile('java', ['-jar', `"${vnu}"`, test], { shell: true }, (error, stdout) => {
-  //   if (error) {
-  //       console.error(`exec error: ${error}`);
-  //       return;
-  //   }
-  //   console.log('실행이 됬다', stdout);
-  //   console.log(stdout);
-  // });
-})
-
+// file explorer
 const homedir = require('os').homedir().split(path.sep);
 let nowLocation = [...homedir];
 
