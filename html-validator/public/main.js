@@ -3,9 +3,10 @@ const { ipcMain } = require('electron');
 const remote = require('@electron/remote/main');
 const path = require('path');
 const fs = require('fs');
-const { execFile } = require('child_process');
+const { execFile, spawn } = require('child_process');
 const vnu = require('vnu-jar');
 const isDev = require("electron-is-dev");
+const JVM = require('node-jvm');
 
 remote.initialize();
 
@@ -23,11 +24,9 @@ function createWindow() {
   win.openDevTools();
   win.loadURL(
     isDev
-    ? 'http://localhost:3000' 
-    : `file://${path.join(__dirname, "../build/index.html")}`
+    ? 'http://localhost:3000'
+    :  `file://${path.join(__dirname, "../build/index.html")}`
   );
-  
-  // remote.enable(win.webContents);
 }
 
 app.on('ready', function() {
@@ -52,12 +51,11 @@ const homedir = require('os').homedir().split(path.sep);
 const nowOS = require('os').type();
 console.log(nowOS);
 let nowLocation = [...homedir];
-console.log('homedir: ' + nowLocation)
-nowLocation.forEach(e => console.log('hh: ' + e))
+// nowLocation.forEach(e => console.log('hh: ' + e))
 ipcMain.on('SET_FILE_LIST', (evt, payload) => {
   // 앱 실행 시 홈 화면에서 시작
-  console.log('payload: ' + payload);
-  console.log('now_loca: ' + nowLocation);
+  // console.log('payload: ' + payload);
+  // console.log('now_loca: ' + nowLocation);
   if (payload !== 'init_folder_list') nowLocation = [...payload];
   // 맥 os 에서 첫 '/' 안붙는 것에 대한 임시 방편 - 추후 수정 요망
   let now = '';
@@ -91,7 +89,8 @@ ipcMain.on('VALIDATE_FILE', (evt, payload) => {
     filePath = path.join(...payload);
   }
   console.log(filePath);
-  execFile('java', ['-jar', `"${vnu}"`, filePath], { shell: true }, (error, stdout) => {
+  const jarPath = __dirname + '/vnu.jar';
+  execFile('java', ['-jar', `${jarPath}`, filePath], { shell: true }, (error, stdout) => {
     if (error) {
         console.error(`exec error: ${error}`);
         evt.reply('SEND_VALI_RESULT', error);
@@ -99,4 +98,15 @@ ipcMain.on('VALIDATE_FILE', (evt, payload) => {
     }
     console.log(stdout);
   });
+  let jvm = new JVM();
+  console.log(jvm)
+  jvm.setLogLevel(7);
+  console.log(jarPath)
+  let entryPointClassName = jvm.loadJarFile(jarPath);
+  // console.log('entrypoint: ' + entryPointClassName);
+  // jvm.setEntryPointClassName(entryPointClassName);
+  // jvm.on("exit", function(code) {
+  //   process.exit(code);
+  // });
+  // console.log(jvm.run(filePath));
 })
