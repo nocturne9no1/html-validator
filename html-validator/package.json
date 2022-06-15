@@ -6,6 +6,7 @@
   "private": true,
   "description": "html-validator",
   "author": "nocturne9no1",
+  "appId": "com.html-validator",
   "dependencies": {
     "@electron/remote": "^2.0.8",
     "@testing-library/jest-dom": "^5.16.4",
@@ -57,22 +58,34 @@
     ]
   },
   "build": {
-    "appId": "com.html-validator",
+    "productName": "html-validator",
     "asar": false,
+    "mac": {
+      "target": [
+        "default"
+      ],
+      "icon": "build/icons/icon.icns"
+    },
     "win": {
       "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
-        }
-      ]
+        "nsis"
+      ],
+      "icon": "build/icons/icon.jpg"
     },
     "nsis": {
       "oneClick": false,
-      "createDesktopShortcut": true
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "perMachine": true,
+      "language": 1042,
+      "installerIcon": "build/icons/icon.jpg",
+      "shortcutName": "HV",
+      "artifactName": "HV-${version}.${ext}",
+      "uninstallDisplayName": "HV"
+    },
+    "directories": {
+      "buildResources": "./build/",
+      "output": "./dist/"
     }
   }
 }
