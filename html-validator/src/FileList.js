@@ -4,7 +4,6 @@ const { ipcRenderer } = window.require('electron');
 const FileList = () => {
   const [fileList, setFileList] = useState([]);
   const [folderRoute, setForderRoute] = useState([]);
-  
   const _handleBtn = (foldername) => {
     if (foldername.includes('.')) {
       ipcRenderer.send('VALIDATE_FILE', [...folderRoute, foldername]);
@@ -18,6 +17,7 @@ const FileList = () => {
     ipcRenderer.send('SET_FILE_LIST', [...folderRoute]);
   }
 
+  // 초기 렌더링 시 폴더 리스트 불러옴
   useEffect(() => {
     ipcRenderer.send('SET_FILE_LIST', 'init_folder_list');
   }, []);
@@ -31,10 +31,10 @@ const FileList = () => {
   return (
     <div className="filelist_wrap">
       <h2 className="breadcrumb">{folderRoute.join('\\')}</h2>
-      <button className="back_btn" onDoubleClick={() => _handBackBtn()}>뒤로가기</button>
+      <button className="back_btn" onClick={() => _handBackBtn()}>뒤로가기</button>
       <ul>
         {fileList.map((el, idx) => <FileListItem el={el} key={idx} 
-            isHtml={el.includes('.')} onDoubleClick={_handleBtn}></FileListItem>)}
+            isHtml={el.includes('.')} onClick={_handleBtn}></FileListItem>)}
       </ul>
     </div>
   )
@@ -43,7 +43,7 @@ const FileList = () => {
 const FileListItem = (props) => {
   return (
     <li className="filelist_item" key={props.idx}>
-      <button className={(props.isHtml ? 'html_file' : 'folder')} onDoubleClick={(foldername) => props.onDoubleClick(props.el)}>
+      <button className={(props.isHtml ? 'html_file' : 'folder')} onClick={(foldername) => props.onClick(props.el)}>
         {props.el}
       </button>
     </li>

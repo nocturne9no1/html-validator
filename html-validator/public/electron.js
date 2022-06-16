@@ -6,7 +6,6 @@ const fs = require('fs');
 const { execFile, spawn } = require('child_process');
 const vnu = require('vnu-jar');
 const isDev = require("electron-is-dev");
-const JVM = require('node-jvm');
 
 remote.initialize();
 
@@ -90,23 +89,18 @@ ipcMain.on('VALIDATE_FILE', (evt, payload) => {
   }
   console.log(filePath);
   const jarPath = __dirname + '/vnu.jar';
+  const sendData = {
+    isError: true,
+    filePath,
+    error: '',
+  };
   execFile('java', ['-jar', `${jarPath}`, filePath], { shell: true }, (error, stdout) => {
     if (error) {
-        console.error(`exec error: ${error}`);
-        evt.reply('SEND_VALI_RESULT', error);
+        sendData.error = error;
+        evt.reply('SEND_VALI_RESULT', sendData);
         return;
     }
-    console.log(stdout);
+    sendData.isError = false;
+    evt.reply('SEND_VALI_RESULT', sendData);
   });
-  let jvm = new JVM();
-  console.log(jvm)
-  jvm.setLogLevel(7);
-  console.log(jarPath)
-  let entryPointClassName = jvm.loadJarFile(jarPath);
-  // console.log('entrypoint: ' + entryPointClassName);
-  // jvm.setEntryPointClassName(entryPointClassName);
-  // jvm.on("exit", function(code) {
-  //   process.exit(code);
-  // });
-  // console.log(jvm.run(filePath));
 })
